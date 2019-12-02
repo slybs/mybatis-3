@@ -20,6 +20,7 @@ import org.apache.ibatis.io.Resources;
 /**
  * To check the existence of version dependent classes.
  */
+@Deprecated
 public class Jdk {
 
   /**

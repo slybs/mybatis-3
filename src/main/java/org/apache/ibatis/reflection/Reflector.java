@@ -49,23 +49,67 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  */
 public class Reflector {
 
+  /**
+   * 对应的类
+   */
   private final Class<?> type;
+  /**
+   * 可读属性数组
+   */
   private final String[] readablePropertyNames;
+  /**
+   * 可写属性集合
+   */
   private final String[] writablePropertyNames;
+  /**
+   * 属性对应的 setting 方法的映射。
+   *
+   * key 为属性名称
+   * value 为 Invoker 对象
+   */
   private final Map<String, Invoker> setMethods = new HashMap<>();
+  /**
+   * 属性对应的 getting 方法的映射。
+   *
+   * key 为属性名称
+   * value 为 Invoker 对象
+   */
   private final Map<String, Invoker> getMethods = new HashMap<>();
+  /**
+   * 属性对应的 setting 方法的方法参数类型的映射。{@link #setMethods}
+   *
+   * key 为属性名称
+   * value 为方法参数类型
+   */
   private final Map<String, Class<?>> setTypes = new HashMap<>();
+  /**
+   * 属性对应的 getting 方法的返回值类型的映射。{@link #getMethods}
+   *
+   * key 为属性名称
+   * value 为返回值的类型
+   */
   private final Map<String, Class<?>> getTypes = new HashMap<>();
+  /**
+   * 默认构造方法
+   */
   private Constructor<?> defaultConstructor;
-
+  /**
+   * 不区分大小写的属性集合
+   */
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
   public Reflector(Class<?> clazz) {
+    // 设置对应的类
     type = clazz;
+    // <1> 初始化 defaultConstructor
     addDefaultConstructor(clazz);
+    // <2> // 初始化 getMethods 和 getTypes ，通过遍历 getting 方法
     addGetMethods(clazz);
+    // <3> // 初始化 setMethods 和 setTypes ，通过遍历 setting 方法。
     addSetMethods(clazz);
+    // <4> // 初始化 getMethods + getTypes 和 setMethods + setTypes ，通过遍历 fields 属性。
     addFields(clazz);
+    // <5> 初始化 readablePropertyNames、writeablePropertyNames、caseInsensitivePropertyMap 属性
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);
     for (String propName : readablePropertyNames) {
@@ -75,13 +119,39 @@ public class Reflector {
       caseInsensitivePropertyMap.put(propName.toUpperCase(Locale.ENGLISH), propName);
     }
   }
-
+  //  private void addDefaultConstructor(Class<?> clazz) {
+//    // 获得所有构造方法
+//    Constructor<?>[] consts = clazz.getDeclaredConstructors();
+//    // 遍历所有构造方法，查找无参的构造方法
+//    for (Constructor<?> constructor : consts) {
+//      // 判断无参的构造方法
+//      if (constructor.getParameterTypes().length == 0) {
+//        // 设置构造方法可以访问，避免是 private 等修饰符
+//        if (canControlMemberAccessible()) {
+//          try {
+//            constructor.setAccessible(true);
+//          } catch (Exception e) {
+//            // Ignored. This is only a final precaution, nothing we can do.
+//          }
+//        }
+//        // 如果构造方法可以访问，赋值给 defaultConstructor
+//        if (constructor.isAccessible()) {
+//          this.defaultConstructor = constructor;
+//        }
+//      }
+//    }
+//  }
   private void addDefaultConstructor(Class<?> clazz) {
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+    //TODO 设置构造方法可以访问，避免是 private 等修饰符 在哪里
     Arrays.stream(constructors).filter(constructor -> constructor.getParameterTypes().length == 0)
       .findAny().ifPresent(constructor -> this.defaultConstructor = constructor);
   }
 
+  /**
+   * 初始化 getMethods 和 getTypes ，通过遍历 getting 方法
+   * @param clazz
+   */
   private void addGetMethods(Class<?> clazz) {
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
     Method[] methods = getClassMethods(clazz);
@@ -275,15 +345,19 @@ public class Reflector {
     Map<String, Method> uniqueMethods = new HashMap<>();
     Class<?> currentClass = clazz;
     while (currentClass != null && currentClass != Object.class) {
+      // public Method[] getDeclaredMethods()对象表示的类或接口声明的所有方法，
+      // 包括公共、保护、默认（包）访问和私有方法，但不包括继承的方法。当然也包括它所实现接口的方法。
       addUniqueMethods(uniqueMethods, currentClass.getDeclaredMethods());
 
       // we also need to look for interface methods -
       // because the class may be abstract
       Class<?>[] interfaces = currentClass.getInterfaces();
       for (Class<?> anInterface : interfaces) {
+        // public Method[] getMethods()返回某个类的所有公用（public）方法包括其继承类的公用方法，
+        // 当然也包括它所实现接口的方法。
         addUniqueMethods(uniqueMethods, anInterface.getMethods());
       }
-
+      //返回当前实体类的父类
       currentClass = currentClass.getSuperclass();
     }
 
@@ -292,8 +366,16 @@ public class Reflector {
     return methods.toArray(new Method[0]);
   }
 
+  /**
+   * 添加方法签名（key）：方法对象（对应的Method对象）
+   * @param uniqueMethods
+   * @param methods
+   */
   private void addUniqueMethods(Map<String, Method> uniqueMethods, Method[] methods) {
     for (Method currentMethod : methods) {
+      //通过Method.isBridge()方法来判断一个方法是否是桥接方法
+      //桥接方法:https://blog.csdn.net/qq_32647893/article/details/81071336
+      //编译器自动生成的桥接方法。桥接方法实际是是调用了实际的泛型方法
       if (!currentMethod.isBridge()) {
         String signature = getSignature(currentMethod);
         // check to see if the method is already known
@@ -306,6 +388,13 @@ public class Reflector {
     }
   }
 
+  /**
+   * 获取方法签名
+   * 比如：method signature 方法签名。
+   * 方法参数个数、类型、返回值类型不同，虽然方法名一样，“签名”也不同。
+   * @param method
+   * @return
+   */
   private String getSignature(Method method) {
     StringBuilder sb = new StringBuilder();
     Class<?> returnType = method.getReturnType();

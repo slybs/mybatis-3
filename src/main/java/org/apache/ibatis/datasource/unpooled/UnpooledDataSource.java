@@ -38,20 +38,62 @@ import org.apache.ibatis.io.Resources;
  */
 public class UnpooledDataSource implements DataSource {
 
-  private ClassLoader driverClassLoader;
-  private Properties driverProperties;
+  /**
+   * 已注册的 Driver 映射
+   *
+   * KEY：Driver 类名
+   * VALUE：Driver 对象
+   */
   private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
 
+  /**
+   * Driver 类加载器
+   */
+  private ClassLoader driverClassLoader;
+  /**
+   * Driver 属性
+   */
+  private Properties driverProperties;
+
+  /**
+   * Driver 类名
+   */
   private String driver;
+  /**
+   * 数据库 URL
+   */
   private String url;
+  /**
+   * 数据库用户名
+   */
   private String username;
+  /**
+   * 数据库密码
+   */
   private String password;
 
+  /**
+   * 是否自动提交事务
+   */
   private Boolean autoCommit;
+  /**
+   * 默认事务隔离级别
+   */
   private Integer defaultTransactionIsolationLevel;
   private Integer defaultNetworkTimeout;
 
   static {
+    // 初始化 registeredDrivers
+    //这里，也就是说UnpooledDataSource加载时，是通过jdk中的DriverManager中
+//    static {
+//      loadInitialDrivers();
+//      println("JDBC DriverManager initialized");
+//    }
+    //把实现了Driver接口的实现类（比如通过maven导入的驱动实现类）都加载进来的。
+    //就是说：即使没有通过Class.forName(*)显示的手动加载驱动,在项目中的实现了Driver的实现类驱动也会被加载进来的。
+//    jdbc4.0 是不用显式的去加载驱动，如果驱动包符合 SPI 模式就会自动加载
+//    就是说程序会自动去项目中查找是否有驱动，当然没有驱动的话自然是连接不了的
+    //JDK 1.6 - JDBC4：java1.6开始起使用JDBC4了
     Enumeration<Driver> drivers = DriverManager.getDrivers();
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();

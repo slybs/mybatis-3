@@ -39,7 +39,23 @@ class GenericTokenParserTest {
       return variables.get(content);
     }
   }
+  @Test
+  public void legeTest(){
+    final Map<String,Object> mapper = new HashMap<String, Object>();
+    mapper.put("name", "张三");
+    mapper.put("pwd", "123456");
 
+    //先初始化一个handler：匿名实现类
+    TokenHandler  handler = new TokenHandler() {
+      @Override
+      public String handleToken(String content) {
+        System.out.println(content);
+        return (String) mapper.get(content);
+      }
+    };
+    GenericTokenParser parser = new GenericTokenParser("${", "}", handler);
+    System.out.println("************" + parser.parse("用户：${name}，你的密码是：${pwd}"));
+  }
   @Test
   void shouldDemonstrateGenericTokenReplacement() {
     GenericTokenParser parser = new GenericTokenParser("${", "}", new VariableTokenHandler(new HashMap<String, String>() {
@@ -51,6 +67,8 @@ class GenericTokenParserTest {
         put("", "");
       }
     }));
+    //输出结果：parser.parse result:James T Kirk reporting.
+    System.out.println("parser.parse result:"+parser.parse("${first_name} ${initial} ${last_name} reporting."));
 
     assertEquals("James T Kirk reporting.", parser.parse("${first_name} ${initial} ${last_name} reporting."));
     assertEquals("Hello captain James T Kirk", parser.parse("Hello captain ${first_name} ${initial} ${last_name}"));
