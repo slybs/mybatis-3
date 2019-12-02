@@ -51,6 +51,7 @@ class AutoConstructorTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
       final Object subject = mapper.getSubject(1);
+      System.out.println(subject.toString());
       assertNotNull(subject);
     }
   }
@@ -59,6 +60,8 @@ class AutoConstructorTest {
   void primitiveSubjects() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
+      List<PrimitiveSubject> subjects = mapper.getSubjects();
+      System.out.println(subjects.size());
       assertThrows(PersistenceException.class, mapper::getSubjects);
     }
   }
