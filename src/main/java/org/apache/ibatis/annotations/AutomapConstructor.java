@@ -52,3 +52,4 @@ import java.lang.annotation.Target;
 @Target({ElementType.CONSTRUCTOR})
 public @interface AutomapConstructor {
 }
+
