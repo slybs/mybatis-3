@@ -255,29 +255,59 @@ public class UnpooledDataSource implements DataSource {
     if (password != null) {
       props.setProperty("password", password);
     }
+    // 执行获得 Connection 连接
     return doGetConnection(props);
   }
 
   private Connection doGetConnection(Properties properties) throws SQLException {
+    // <1> 初始化 Driver
     initializeDriver();
+    // <2> 获得 Connection 对象
     Connection connection = DriverManager.getConnection(url, properties);
+    // <3> 配置 Connection 对象
     configureConnection(connection);
     return connection;
   }
 
+  /**
+   * 初始化 Driver
+   * @throws SQLException
+   * 如上，initializeDriver 方法主要包含三步操作，分别如下：
+   *
+   * 加载驱动
+   * 通过反射创建驱动实例
+   * 注册驱动实例
+   * 这三步都是都是常规操作，比较容易理解。上面代码中出现了缓存相关的逻辑，这个是用于避免重复注册驱动。
+   * 因为 initializeDriver 放阿飞并不是在 UnpooledDataSource 初始化时被调用的，而是在获取数据库连接时被调用的。
+   * 因此这里需要做个检测，避免每次获取数据库连接时都重新注册驱动。
+   * 这个是一个比较小的点，大家看代码时注意一下即可。下面看一下获取数据库连接的逻辑。
+   */
   private synchronized void initializeDriver() throws SQLException {
+    // 判断 registeredDrivers 是否已经存在该 driver ，若不存在，进行初始化
+    // 检测缓存中是否包含了与 driver 对应的驱动实例
     if (!registeredDrivers.containsKey(driver)) {
       Class<?> driverType;
       try {
+        // <2> 获得 driver 类
+        // 使用 driverClassLoader 加载驱动
         if (driverClassLoader != null) {
           driverType = Class.forName(driver, true, driverClassLoader);
         } else {
+          // 通过其他 ClassLoader 加载驱动
           driverType = Resources.classForName(driver);
         }
         // DriverManager requires the driver to be loaded via the system ClassLoader.
         // http://www.kfu.com/~nsayer/Java/dyn-jdbc.html
+        // <3> // 通过反射创建驱动实例 创建 Driver 对象
         Driver driverInstance = (Driver)driverType.getDeclaredConstructor().newInstance();
+        // 创建 DriverProxy 对象，并注册到 DriverManager 中
+        /*
+         * 注册驱动，注意这里是将 Driver 代理类 DriverProxy 对象注册到 DriverManager 中的，
+         * 而非 Driver 对象本身。DriverProxy 中并没什么特别的逻辑，就不分析。
+         */
         DriverManager.registerDriver(new DriverProxy(driverInstance));
+        // 缓存驱动类名和实例
+        // 添加到 registeredDrivers 中
         registeredDrivers.put(driver, driverInstance);
       } catch (Exception e) {
         throw new SQLException("Error setting driver on UnpooledDataSource. Cause: " + e);
@@ -285,13 +315,20 @@ public class UnpooledDataSource implements DataSource {
     }
   }
 
+  /**
+   * 配置 Connection 对象
+   * @param conn
+   * @throws SQLException
+   */
   private void configureConnection(Connection conn) throws SQLException {
     if (defaultNetworkTimeout != null) {
       conn.setNetworkTimeout(Executors.newSingleThreadExecutor(), defaultNetworkTimeout);
     }
+    // 设置自动提交
     if (autoCommit != null && autoCommit != conn.getAutoCommit()) {
       conn.setAutoCommit(autoCommit);
     }
+    // 设置事务隔离级别
     if (defaultTransactionIsolationLevel != null) {
       conn.setTransactionIsolation(defaultTransactionIsolationLevel);
     }
@@ -333,7 +370,7 @@ public class UnpooledDataSource implements DataSource {
     public boolean jdbcCompliant() {
       return this.driver.jdbcCompliant();
     }
-
+    //使用 MyBatis 自定义的 Logger 对象。
     @Override
     public Logger getParentLogger() {
       return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
@@ -349,7 +386,6 @@ public class UnpooledDataSource implements DataSource {
   public boolean isWrapperFor(Class<?> iface) throws SQLException {
     return false;
   }
-
   @Override
   public Logger getParentLogger() {
     // requires JDK version 1.6
