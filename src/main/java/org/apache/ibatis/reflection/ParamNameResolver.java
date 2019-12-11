@@ -33,6 +33,10 @@ public class ParamNameResolver {
   public static final String GENERIC_NAME_PREFIX = "param";
 
   /**
+   * ParamNameResolver 使用 name 宇段（ SortedMap<Integer, String＞类型）记录了参数在参
+   * 数列表中 的位置索 引与参数名称之间的对应关系，其中 key 表示参数在参数列表中的索引位置，
+   * va lue 表示参数名称 ，参数名称可以通过＠Param 注解指定，如果没有指定＠Param 注解，则使
+   * 用参数索寻｜作为其名称 。
    * <p>
    * The key is the index and the value is the name of the parameter.<br />
    * The name is obtained from {@link Param} if specified. When {@link Param} is not specified,
@@ -49,6 +53,11 @@ public class ParamNameResolver {
 
   private boolean hasParamAnnotation;
 
+  /**
+   * 在 MethodSignature 中， 会使用 ParamNameResolver 处理 Mapper 接口中定义的方法的参数 列表。
+   * @param config
+   * @param method
+   */
   public ParamNameResolver(Configuration config, Method method) {
     final Class<?>[] paramTypes = method.getParameterTypes();
     final Annotation[][] paramAnnotations = method.getParameterAnnotations();

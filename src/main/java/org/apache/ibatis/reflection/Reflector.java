@@ -49,52 +49,26 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  */
 public class Reflector {
 
-  /**
-   * 对应的类
-   */
+  //对应的Class 类型
   private final Class<?> type;
-  /**
-   * 可读属性数组
-   */
+  //可读属性的名称集合，可读属性就是存在相应getter 方法的属性，初始值为空数纽
   private final String[] readablePropertyNames;
-  /**
-   * 可写属性集合
-   */
+  //可写属性的名称集合，可写属性就是存在相应setter 方法的属性，初始值为空数纽
   private final String[] writablePropertyNames;
-  /**
-   * 属性对应的 setting 方法的映射。
-   *
-   * key 为属性名称
-   * value 为 Invoker 对象
-   */
+  //记录了属性相应的setter 方法， key 是属性名称， value 是Invoker 对象，它是对setter 方法对应
   private final Map<String, Invoker> setMethods = new HashMap<>();
-  /**
-   * 属性对应的 getting 方法的映射。
-   *
-   * key 为属性名称
-   * value 为 Invoker 对象
-   */
+  //记录了属性相应的getter 方法， key 是属性名称， value 是Invoker 对象，它是对setter 方法对应
   private final Map<String, Invoker> getMethods = new HashMap<>();
-  /**
-   * 属性对应的 setting 方法的方法参数类型的映射。{@link #setMethods}
-   *
-   * key 为属性名称
-   * value 为方法参数类型
-   */
+  //记录了属性相应的setter 方法的参数值类型， ke y 是属性名称， value 是setter 方法的参数类型
   private final Map<String, Class<?>> setTypes = new HashMap<>();
-  /**
-   * 属性对应的 getting 方法的返回值类型的映射。{@link #getMethods}
-   *
-   * key 为属性名称
-   * value 为返回值的类型
-   */
+  //记录了属性相应的getter 方法的返回位类型， key 是属性名称， value 是getter 方法的返回位类型
   private final Map<String, Class<?>> getTypes = new HashMap<>();
   /**
    * 默认构造方法
    */
   private Constructor<?> defaultConstructor;
   /**
-   * 不区分大小写的属性集合
+   * 不区分大小写的属性集合  //记录了所有属性名称的集合
    */
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
@@ -141,6 +115,12 @@ public class Reflector {
 //      }
 //    }
 //  }
+
+  /**
+   * 查找clazz的无参构造方法，通过反射遍历所有构造方法，找到构造参数集合长度为0的。
+   * 主要实现的思想是，通过clazz.getDeclaredConstructors();获取所有构造方法集合，然后循环遍历 判断参数长度为0的，并且构造函数权限可控制的设为默认构造方法。
+   * @param clazz
+   */
   private void addDefaultConstructor(Class<?> clazz) {
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
     //TODO 设置构造方法可以访问，避免是 private 等修饰符 在哪里
@@ -149,12 +129,17 @@ public class Reflector {
   }
 
   /**
-   * 初始化 getMethods 和 getTypes ，通过遍历 getting 方法
+   * 处理clazz 中的getter 方法，填充getMethods 集合和getTypes 集合
    * @param clazz
    */
   private void addGetMethods(Class<?> clazz) {
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
+    //获取当前类以及父类中定义的所有方法的唯一签名以及相应的Method对象。
     Method[] methods = getClassMethods(clazz);
+    /**
+     * PropertyNamer.isGetter /判断如果方法明是以get开头并且方法名长度大于3 或者 方法名是以is开头并且长度大于2
+     * /将方法名截取，如果是is从第二位截取，如果是get或者set从第三位开始截取
+     */
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveGetterConflicts(conflictingGetters);

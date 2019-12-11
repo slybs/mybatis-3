@@ -28,9 +28,10 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
  * @author Clinton Begin
+ * 元信息类MetaClass的构造方法为私有类型，所以不能直接创建，必须使用其提供的forClass方法进行创建
  */
 public class MetaClass {
-
+  //两个新的类ReflectorFactory和Reflector，MetaClass 通过引入这些新类帮助它完成功能
   private final ReflectorFactory reflectorFactory;
   private final Reflector reflector;
 
@@ -39,6 +40,12 @@ public class MetaClass {
     this.reflector = reflectorFactory.findForClass(type);
   }
 
+  /**
+   * 元信息类MetaClass的构造方法为私有类型，所以不能直接创建，必须使用其提供的forClass方法进行创建
+   * @param type
+   * @param reflectorFactory
+   * @return
+   */
   public static MetaClass forClass(Class<?> type, ReflectorFactory reflectorFactory) {
     return new MetaClass(type, reflectorFactory);
   }
@@ -131,11 +138,27 @@ public class MetaClass {
     return null;
   }
 
+  /**
+   * 从下面的代码中，我们可以看出 MetaClass 中的 hasSetter 方法最终调用了 Reflector 的 hasSetter 方法。
+   * 关于 Reflector 的 hasSetter 方法，这里先不分析，Reflector 这个类的逻辑较为复杂，
+   * 本节会在随后进行详细说明。下面来简单介绍一下上面代码中出现的几个类：
+   *
+   * ReflectorFactory -> 顾名思义，Reflector 的工厂类，兼有缓存 Reflector 对象的功能
+   * Reflector -> 反射器，用于解析和存储目标类中的元信息
+   * PropertyTokenizer -> 属性名分词器，用于处理较为复杂的属性名
+   * @param name
+   * @return
+   */
   public boolean hasSetter(String name) {
+    // 属性分词器，用于解析属性名
     PropertyTokenizer prop = new PropertyTokenizer(name);
+    // hasNext 返回 true，则表明 name 是一个复合属性，后面会进行分析
     if (prop.hasNext()) {
+      // 调用 reflector 的 hasSetter 方法
       if (reflector.hasSetter(prop.getName())) {
+        // 为属性创建创建 MetaClass
         MetaClass metaProp = metaClassForProperty(prop.getName());
+        // 再次调用 hasSetter
         return metaProp.hasSetter(prop.getChildren());
       } else {
         return false;

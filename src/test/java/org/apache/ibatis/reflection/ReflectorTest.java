@@ -29,7 +29,24 @@ import static com.googlecode.catchexception.apis.BDDCatchException.*;
 import static org.assertj.core.api.BDDAssertions.then;
 
 class ReflectorTest {
+  interface Entity<T> {
+    T getId();
 
+    void setId(T id);
+  }
+
+  static abstract class AbstractEntity implements Entity<Long> {
+    private Long id;
+    @Override
+    public Long getId() {
+      return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+      this.id = id;
+    }
+  }
   static class Section extends AbstractEntity implements Entity<Long> {
   }
   @Test
@@ -52,27 +69,6 @@ class ReflectorTest {
     ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
     Reflector reflector = reflectorFactory.findForClass(Section.class);
     Assertions.assertFalse(reflector.hasGetter("class"));
-  }
-
-  interface Entity<T> {
-    T getId();
-
-    void setId(T id);
-  }
-
-  static abstract class AbstractEntity implements Entity<Long> {
-
-    private Long id;
-
-    @Override
-    public Long getId() {
-      return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-      this.id = id;
-    }
   }
 
 

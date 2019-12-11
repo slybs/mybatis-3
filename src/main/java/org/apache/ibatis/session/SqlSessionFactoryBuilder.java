@@ -44,6 +44,13 @@ public class SqlSessionFactoryBuilder {
     return build(reader, null, properties);
   }
 
+  /**
+   * build方法1
+   * @param reader
+   * @param environment
+   * @param properties
+   * @return
+   */
   public SqlSessionFactory build(Reader reader, String environment, Properties properties) {
     try {
       XMLConfigBuilder parser = new XMLConfigBuilder(reader, environment, properties);
@@ -72,9 +79,18 @@ public class SqlSessionFactoryBuilder {
     return build(inputStream, null, properties);
   }
 
+  /**
+   * build方法2
+   * @param inputStream
+   * @param environment
+   * @param properties
+   * @return
+   */
   public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
     try {
+      // 创建配置文件解析器
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);
+      // 调用 parse 方法解析配置文件，生成 Configuration 对象
       return build(parser.parse());
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error building SqlSession.", e);
@@ -88,7 +104,13 @@ public class SqlSessionFactoryBuilder {
     }
   }
 
+  /**
+   * build方法3（方法2会走到这里）
+   * @param config
+   * @return
+   */
   public SqlSessionFactory build(Configuration config) {
+    //// 创建 DefaultSqlSessionFactory
     return new DefaultSqlSessionFactory(config);
   }
 
