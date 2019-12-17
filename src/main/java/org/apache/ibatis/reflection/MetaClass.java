@@ -32,7 +32,9 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
  */
 public class MetaClass {
   //两个新的类ReflectorFactory和Reflector，MetaClass 通过引入这些新类帮助它完成功能
+  //ReflectorFactory -> 顾名思义，Reflector 的工厂类，兼有缓存 Reflector 对象的功能
   private final ReflectorFactory reflectorFactory;
+  //Reflector -> 反射器，用于解析和存储目标类中的元信息
   private final Reflector reflector;
 
   private MetaClass(Class<?> type, ReflectorFactory reflectorFactory) {
@@ -150,7 +152,7 @@ public class MetaClass {
    * @return
    */
   public boolean hasSetter(String name) {
-    // 属性分词器，用于解析属性名
+    // 属性分词器，用于解析属性名 用于处理较为复杂的属性名
     PropertyTokenizer prop = new PropertyTokenizer(name);
     // hasNext 返回 true，则表明 name 是一个复合属性，后面会进行分析
     if (prop.hasNext()) {
@@ -158,7 +160,7 @@ public class MetaClass {
       if (reflector.hasSetter(prop.getName())) {
         // 为属性创建创建 MetaClass
         MetaClass metaProp = metaClassForProperty(prop.getName());
-        // 再次调用 hasSetter
+        // 再次调用 hasSetter TODO hasSetter这里是一个循环调用！！！
         return metaProp.hasSetter(prop.getChildren());
       } else {
         return false;

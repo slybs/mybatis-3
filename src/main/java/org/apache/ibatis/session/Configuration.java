@@ -97,9 +97,12 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ * MyBatis Configuration 对象。XML 和注解中解析到的配置，最终都会设置到 org.apache.ibatis.session.Configuration 中。
  */
 public class Configuration {
-
+  /**
+   * DB Environment 对象
+   */
   protected Environment environment;
 
   protected boolean safeRowBoundsEnabled;

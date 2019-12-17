@@ -30,6 +30,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ * 基础构造器抽象类，为子类提供通用的工具类。
  */
 public abstract class BaseBuilder {
   protected final Configuration configuration;
@@ -46,23 +47,38 @@ public abstract class BaseBuilder {
     return configuration;
   }
 
+  /**
+   * 1.创建正则表达式
+   * @param regex
+   * @param defaultValue
+   * @return
+   */
   protected Pattern parseExpression(String regex, String defaultValue) {
     return Pattern.compile(regex == null ? defaultValue : regex);
   }
 
+  /**
+   * 2.将字符串转换成对应的数据类型的值
+   * @param value
+   * @param defaultValue
+   * @return
+   */
   protected Boolean booleanValueOf(String value, Boolean defaultValue) {
     return value == null ? defaultValue : Boolean.valueOf(value);
   }
-
   protected Integer integerValueOf(String value, Integer defaultValue) {
     return value == null ? defaultValue : Integer.valueOf(value);
   }
-
   protected Set<String> stringSetValueOf(String value, String defaultValue) {
     value = value == null ? defaultValue : value;
     return new HashSet<>(Arrays.asList(value.split(",")));
   }
 
+  /**
+   * 3.解析对应的 JdbcType 类型
+   * @param alias
+   * @return
+   */
   protected JdbcType resolveJdbcType(String alias) {
     if (alias == null) {
       return null;
@@ -74,6 +90,11 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 4.解析对应的 ResultSetType 类型
+   * @param alias
+   * @return
+   */
   protected ResultSetType resolveResultSetType(String alias) {
     if (alias == null) {
       return null;
@@ -85,6 +106,11 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 5.解析对应的 ParameterMode 类型
+   * @param alias
+   * @return
+   */
   protected ParameterMode resolveParameterMode(String alias) {
     if (alias == null) {
       return null;
@@ -96,6 +122,11 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 6. TODO 创建指定对象?从 typeAliasRegistry 中，通过别名或类全名，获得对应的类
+   * @param alias
+   * @return
+   */
   protected Object createInstance(String alias) {
     Class<?> clazz = resolveClass(alias);
     if (clazz == null) {
@@ -119,6 +150,12 @@ public abstract class BaseBuilder {
     }
   }
 
+  /**
+   * 7.从 typeHandlerRegistry 中获得或创建对应的 TypeHandler 对象。
+   * @param javaType
+   * @param typeHandlerAlias
+   * @return
+   */
   protected TypeHandler<?> resolveTypeHandler(Class<?> javaType, String typeHandlerAlias) {
     if (typeHandlerAlias == null) {
       return null;

@@ -44,7 +44,12 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 /**
  * This class represents a cached set of class definition information that
  * allows for easy mapping between property names and getter/setter methods.
- *
+ * Reflector 这个类的用途主要是是通过反射获取目标类的 getter 方法及其返回值类型，setter 方法及其参数值类型等元信息。
+ * 并将获取到的元信息缓存到相应的集合中，供后续使用。Reflector 本身代码比较多，
+ * 这里不能一一分析。本小节，将会分析三部分逻辑，分别如下：
+ *    Reflector 构造方法及成员变量分析
+ *    getter 方法解析过程
+ *    setter 方法解析过程
  * @author Clinton Begin
  */
 public class Reflector {
