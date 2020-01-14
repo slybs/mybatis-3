@@ -44,7 +44,7 @@ class EnumWithOgnlTest {
         configuration.getTypeAliasRegistry().registerAlias(Person.class);
         configuration.addMapper(PersonMapper.class);
         configuration.addMapper(PersonMapper2.class);
-        new DefaultSqlSessionFactory(configuration);
+      DefaultSqlSessionFactory defaultSqlSessionFactory = new DefaultSqlSessionFactory(configuration);
     }
     @Test
     void testMixedConfiguration() throws Exception {

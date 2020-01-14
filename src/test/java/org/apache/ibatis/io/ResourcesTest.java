@@ -37,6 +37,7 @@ class ResourcesTest extends BaseDataTest {
 
   @Test
   void shouldGetUrlForResource() throws Exception {
+    //JPETSTORE_PROPERTIES = "org/apache/ibatis/databases/jpetstore/jpetstore-hsqldb.properties";
     URL url = Resources.getResourceURL(JPETSTORE_PROPERTIES);
     assertTrue(url.toString().endsWith("jpetstore/jpetstore-hsqldb.properties"));
   }
