@@ -3,8 +3,18 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.ibatis.aaletetest.dao.IUserDao">
-    <!--配置查询所有-->
-    <select id="findAll" resultType="org.apache.ibatis.aaletetest.domain.User">
+    <!--配置查询所有  对于个别情况，有的sql需要执行很长时间或其他的话，可以对单个sql做个性化超时设置-->
+    <select id="findAll" resultType="org.apache.ibatis.aaletetest.domain.User" timeout="1">
         select * from user
     </select>
+  <insert id="addUser" parameterType="org.apache.ibatis.aaletetest.domain.User">
+    INSERT INTO user
+      (id, username, birthday, sex,address)
+    VALUES (#{id}, #{username}, #{birthday}, #{sex}, #{address})
+    ON DUPLICATE KEY UPDATE id = #{id}
+  </insert>
+  <select id="findByName" parameterType="java.lang.String" resultType="org.apache.ibatis.aaletetest.domain.User" timeout="1">
+    SELECT * FROM user
+    WHERE username = #{username}
+  </select>
 </mapper>
