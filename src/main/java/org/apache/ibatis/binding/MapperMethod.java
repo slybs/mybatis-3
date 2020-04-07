@@ -50,8 +50,11 @@ import org.apache.ibatis.session.SqlSession;
  * 可以将 MapperMethod 看作连接 Mapper 接口以及映射配置文件中定义的 SQL 语句的桥梁。
  */
 public class MapperMethod {
+  //一个内部封 封装了SQL标签的类型 insert update delete select
   //记录了 SQL语句的名称和类型
   private final SqlCommand command;
+
+  //一个内部类 封装了方法的参数信息 返回类型信息等
   //Mapper 接口中对应方法的相关信息
   private final MethodSignature method;
 
