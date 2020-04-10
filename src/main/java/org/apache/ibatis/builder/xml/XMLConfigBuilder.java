@@ -487,10 +487,25 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析<transactionManager>节点，创建对应的TransactionFactory
+   *     如上述代码所示，
+   *     如果type = "JDBC",则MyBatis会创建一个JdbcTransactionFactory.class 实例；
+   *     如果type="MANAGED"，则MyBatis会创建一个MangedTransactionFactory.class实例。
+   * @param context
+   * @return
+   * @throws Exception
+   */
   private TransactionFactory transactionManagerElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
+      /**
+       * 在Configuration初始化的时候，会通过以下语句，给JDBC和MANAGED对应的工厂类
+       * typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
+       * typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);
+       * 下述的resolveClass(type).newInstance()会创建对应的工厂实例
+       */
       TransactionFactory factory = (TransactionFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props);
       return factory;

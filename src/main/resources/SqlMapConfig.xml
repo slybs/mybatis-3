@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- mybatis的主配置文件 -->
+<configuration>
+    <!-- 配置环境 -->
+    <environments default="mysql">
+        <!-- 配置mysql的环境-->
+        <environment id="mysql">
+            <!-- 配置事务的类型-->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 配置数据源（连接池） -->
+            <dataSource type="POOLED">
+                <!-- 配置连接数据库的4个基本信息 -->
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 指定映射配置文件的位置，映射配置文件指的是每个dao独立的配置文件 -->
+    <mappers>
+        <mapper resource="mapper/IUserDao.xml"/>
+        <!--<package name="com.lege.dao"/> 这样好像不行-->
+    </mappers>
+    <!--&lt;!&ndash; Using classpath relative resources &ndash;&gt;-->
+    <!--<mappers>-->
+        <!--<mapper resource="org/mybatis/builder/AuthorMapper.xml"/>-->
+        <!--<mapper resource="org/mybatis/builder/BlogMapper.xml"/>-->
+        <!--<mapper resource="org/mybatis/builder/PostMapper.xml"/>-->
+    <!--</mappers>-->
+    <!--&lt;!&ndash; Using url fully qualified paths &ndash;&gt;-->
+    <!--<mappers>-->
+        <!--<mapper url="file:///var/mappers/AuthorMapper.xml"/>-->
+        <!--<mapper url="file:///var/mappers/BlogMapper.xml"/>-->
+        <!--<mapper url="file:///var/mappers/PostMapper.xml"/>-->
+    <!--</mappers>-->
+    <!--&lt;!&ndash; Using mapper interface classes &ndash;&gt;-->
+    <!--<mappers>-->
+        <!--<mapper class="org.mybatis.builder.AuthorMapper"/>-->
+        <!--<mapper class="org.mybatis.builder.BlogMapper"/>-->
+        <!--<mapper class="org.mybatis.builder.PostMapper"/>-->
+    <!--</mappers>-->
+    <!--&lt;!&ndash; Register all interfaces in a package as mappers &ndash;&gt;-->
+    <!--<mappers>-->
+        <!--<package name="org.mybatis.builder"/>-->
+    <!--</mappers>-->
+</configuration>
