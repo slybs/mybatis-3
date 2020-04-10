@@ -1,0 +1,8 @@
+mybatis整合第三方连接池：
+方式1：DruidDataSourceFactory Demo
+    1.需要自定义一个 XxxxDataSourceFactory 并实现 implements DataSourceFactory
+    2.在配置文件中：
+        <typeAlias  alias="DRUID" type="com.lege.officialcn.datasource.DruidDataSource.DruidDataSourceFactory"/>
+        <dataSource type="DRUID"> type指定具体的DataSourceFactory实现类
+方式2：HikariCPDataSourceFactory Demo
+    1.HikariCPDataSourceFactory extends UnpooledDataSourceFactory

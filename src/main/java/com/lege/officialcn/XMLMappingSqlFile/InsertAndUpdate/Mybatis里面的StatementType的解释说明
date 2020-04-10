@@ -1,0 +1,19 @@
+
+1.原文链接：https://blog.csdn.net/u012060033/article/details/85678693
+    在mapper文件中可以使用statementType标记使用什么的对象操作SQL语句。 
+
+    statementType：标记操作SQL的对象 
+
+    要实现动态传入表名、列名，需要做如下修改 ，添加属性statementType=”STATEMENT” ，同时sql里的属有变量取值都改成${xxxx}，而不是#{xxx}
+
+
+    注意！注意！注意！重点！重点！重点！
+    取值说明： 
+    1、STATEMENT:直接操作sql，不进行预编译，获取数据：$—Statement 
+    2、PREPARED:预处理，参数，进行预编译，获取数据：#—–PreparedStatement:默认 
+    3、CALLABLE:执行存储过程————CallableStatement 
+
+    另外说明下：如果只为STATEMENT，那么sql就是直接进行的字符串拼接，这样为字符串需要加上引号，
+    如果为PREPARED，是使用的参数替换，也就是索引占位符，我们的#会转换为?再设置对应的参数的值
+ 
+————————————————

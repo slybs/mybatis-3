@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="extend.use.dao.HobbyMapper">
+    <resultMap id="hobbyResult" type="extend.use.domain.Hobby">
+        <result column="hobbys" jdbcType="VARCHAR" property="hobbys" typeHandler="extend.use.typeHandlers.MyTypeHandler1"></result>
+    </resultMap>
+    <select id="getHobbyById"  parameterType="long" resultMap="hobbyResult">
+        select * from hobby where id=#{id}
+    </select>
+    <insert id="insertHobby" parameterType="extend.use.domain.Hobby">
+        insert into hobby (hobbys) values (#{hobbys,typeHandler=extend.use.typeHandlers.MyTypeHandler1})
+    </insert>
+</mapper>

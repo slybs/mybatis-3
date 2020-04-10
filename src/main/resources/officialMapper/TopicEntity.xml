@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lege.officialcn.dao.ITopicDao">
+    <insert id="addTopic" parameterType="com.lege.officialcn.domain.TopicEntity">
+        INSERT INTO TopicEntity
+                (topicId, Title, Summary, PicUrl,TopicType,Recommend,Status,StatusCode,AddTime,ModifyTime,Source)
+        VALUES (#{topicId}, #{title}, #{summary}, #{picUrl}, #{topicType}, #{recommend}, #{status}, #{statusCode}, #{addTime}, #{modifyTime}, #{source})
+        ON DUPLICATE KEY UPDATE topicId = #{topicId}
+    </insert>
+    <select id="getTopicByIds" parameterType="java.util.List" resultType="com.lege.officialcn.domain.TopicEntity">
+        SELECT TopicID,Title, Summary,PicUrl,TopicType,Recommend,Status,StatusCode,Source,AddTime,ModifyTime,UpdateTime
+        FROM TopicEntity
+        WHERE TopicID IN
+        <foreach collection="topicIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        order by statusCode desc # desc从大到小 asc返回结果list中从小到大
+        # limit 1
+    </select>
+
+    <update id="updateTopic" parameterType="com.lege.officialcn.domain.TopicEntity">
+        UPDATE TopicEntity
+        SET Title = #{title}, Summary = #{summary}, PicUrl = #{picUrl}, TopicType = #{topicType}
+        , Recommend = #{recommend}, Status = #{status}, StatusCode = #{statusCode},ModifyTime = #{modifyTime}
+        WHERE TopicID = #{topicId}
+    </update>
+
+
+    <select id="getTopicIds" parameterType="map" resultType="int">
+        select TopicID
+        from TopicEntity
+        where TopicType = 1
+        <if test="recommend >= 0">
+        and recommend = #{recommend}
+        </if>
+        <if test="status >= 0">
+        and status = #{status}
+        </if>
+    </select>
+
+    <select id="getSummaryByIdsAndTopicTypeAndRecommedAndStatus" parameterType="map" resultType="com.lege.officialcn.domain.TopicEntity">
+        SELECT Summary
+        FROM TopicEntity
+        WHERE TopicID IN
+        <foreach collection="topicIds" item="id" open="(" close=")" separator=",">
+          #{id}
+        </foreach>
+        AND topicType = #{topicType}
+        <if test="status > 0">
+          AND Status = #{status}
+        </if>
+        <if test="recommend > 0">
+          AND recommend = #{recommend}
+        </if>
+    </select>
+
+
+    <select id="paginateTopic" parameterType="map" resultType="com.lege.officialcn.domain.TopicEntity">
+        SELECT TopicID,Title, Summary
+        FROM TopicEntity
+        WHERE TopicID > 0
+        <if test="recommend >= 0">
+            AND Recommend = #{recommend}
+        </if>
+        <if test="status >= 0">
+            AND Status = #{status}
+        </if>
+        LIMIT #{start}, #{limit}
+    </select>
+
+    <select id="paginateTopicCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM TopicEntity
+        WHERE TopicID > 0
+        <if test="recommend >= 0">
+            AND Recommend = #{recommend}
+        </if>
+        <if test="status >= 0">
+            AND Status = #{status}
+        </if>
+    </select>
+
+
+
+</mapper>

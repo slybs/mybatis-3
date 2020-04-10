@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lege.officialcn.dao.useGeneratedKeysAndSelectKeyDao.AuthorDao">
+
+    <insert id="insertAuthor1" parameterType="com.lege.officialcn.domain.useGeneratedKeysAndSelectKeyDomain.Author">
+        insert into Author (username,password,email)
+        values (#{username},#{password},#{email})
+    </insert>
+    <!--keyProperty="id" keyColumn="id"：
+        如果你的数据库支持自动生成主键的字段（比如 MySQL 和 SQL Server），那么你可以设置 useGeneratedKeys=”true”，然后再把 keyProperty 设置到目标属性上就 OK 了
+        其中keyProperty的值是对象的属性值不是数据库表中的字段名
+        keyColumn是对应数据库表中的字段名
+        keyProperty	（仅对 insert 和 update 有用）唯一标记一个属性，MyBatis 会通过 getGeneratedKeys
+            的返回值或者通过 insert 语句的 selectKey 子元素设置它的键值，默认值：未设置（unset）。如果希望得到多个生成的列，也可以是逗号分隔的属性名称列表。
+    -->
+    <insert id="insertAuthor2" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into Author (username,password,email) values (#{username},#{password},#{email})
+    </insert>
+
+
+    <!--新增信息，并拿到新增信息的表主键信息。
+    新增数据，得到主键的外层写法没什么特别，跟普通的insert一样。只不过里面加了selectKey-->
+    <insert id="insertAuthor21" parameterType="com.lege.officialcn.domain.useGeneratedKeysAndSelectKeyDomain.Author">
+        <!--selectKey  会将 SELECT LAST_INSERT_ID()的结果放入到传入的model的主键里面，
+            keyProperty 对应的model中的主键的属性名，这里是 user 中的id，因为它跟数据库的主键对应
+            order AFTER 表示 SELECT LAST_INSERT_ID() 在insert执行之后执行,多用与自增主键，
+                  BEFORE 表示 SELECT LAST_INSERT_ID() 在insert执行之前执行，这样的话就拿不到主键了，
+                        这种适合那种主键不是自增的类型
+            resultType 主键类型 -->
+        <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into Author (username,password,email) values(#{username},#{password},#{email})
+    </insert>
+
+
+    <!--&lt;!&ndash; 跟普通的insert没有什么不同的地方 &ndash;&gt;-->
+    <!--<insert id="insertAuthor22" parameterType="com.lege.officialcn.domain.useGeneratedKeysAndSelectKeyDomain.Author">-->
+        <!--&lt;!&ndash; 跟自增主键方式相比，这里的不同之处只有两点-->
+                    <!--1  insert语句需要写id字段了，并且 values里面也不能省略-->
+                    <!--2 selectKey 的order属性需要写成BEFORE 因为这样才能将生成的uuid主键放入到model中，-->
+                    <!--这样后面的insert的values里面的id才不会获取为空-->
+              <!--跟自增主键相比就这点区别，当然了这里的获取主键id的方式为 select uuid()-->
+              <!--当然也可以另写别生成函数。&ndash;&gt;-->
+        <!--<selectKey keyProperty="id" order="BEFORE" resultType="String">-->
+            <!--select uuid()-->
+        <!--</selectKey>-->
+        <!--insert into Author (id,username,password,email)-->
+        <!--values (#{id},#{username},#{password},#{email})-->
+    <!--</insert>-->
+
+    <!--如果你的数据库还支持多行插入, 你也可以传入一个 Author 数组或集合，并返回自动生成的主键。-->
+    <insert id="insertAuthor3Batch" parameterType="com.lege.officialcn.domain.useGeneratedKeysAndSelectKeyDomain.Author" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into Author (username, password, email) values
+        <foreach collection="list"  item="item" separator=",">
+            (#{item.username}, #{item.password}, #{item.email})
+        </foreach>
+    </insert>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--TODO:批量查询 ==========>foreach测试-->
+
+    <select id="batchGetInParamList" resultType="com.lege.officialcn.domain.useGeneratedKeysAndSelectKeyDomain.Author">
+        select * from Author where id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="batchGetInParamArray" resultType="com.lege.officialcn.domain.useGeneratedKeysAndSelectKeyDomain.Author">
+        select * from Author where id in
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="batchGetInParamMap" resultType="com.lege.officialcn.domain.useGeneratedKeysAndSelectKeyDomain.Author">
+        select * from Author where username like "%"#{username}"%"
+        and id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

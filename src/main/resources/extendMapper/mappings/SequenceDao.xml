@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="extend.use.plugins.subtable.dao.SequenceDao">
+    <insert id="getNextId" parameterType="extend.use.plugins.subtable.entity.Sequence" useGeneratedKeys="true">
+    	REPLACE INTO jwxa_sequence(stub) VALUES('a')
+    	<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID() AS id
+		</selectKey>
+    </insert>
+</mapper>

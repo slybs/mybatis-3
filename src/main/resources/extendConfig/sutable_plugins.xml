@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- mybatis的主配置文件 -->
+<configuration>
+
+
+    <!--<typeHandlers>-->
+    <!--&lt;!&ndash;这里这里的javaType和jdbcType的配置 非常重要，要特别注意&ndash;&gt;-->
+    <!--&lt;!&ndash;<typeHandler handler="extend.use.typeHandlers.MyTypeHandler1" javaType="String" jdbcType="VARCHAR"/>&ndash;&gt;-->
+    <!--<typeHandler handler="extend.use.typeHandlers.MyTypeHandler1"/>-->
+    <!--&lt;!&ndash;说明：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：：-->
+    <!--通过类型处理器的泛型，MyBatis 可以得知该类型处理器处理的 Java 类型，不过这种行为可以通过两种方法改变：-->
+    <!--1.在类型处理器的配置元素（typeHandler 元素）上增加一个 javaType 属性（比如：javaType="String"）；-->
+    <!--2.在类型处理器的类上（TypeHandler class）增加一个 @MappedTypes 注解来指定与其关联的 Java 类型列表。-->
+    <!--如果在 javaType 属性中也同时指定，则注解方式将被忽略。-->
+    <!--可以通过两种方式来指定被关联的 JDBC 类型：-->
+    <!--1.在类型处理器的配置元素上增加一个 jdbcType 属性（比如：jdbcType="VARCHAR"）；-->
+    <!--2.在类型处理器的类上增加一个 @MappedJdbcTypes 注解来指定与其关联的 JDBC 类型列表。-->
+    <!--如果在 jdbcType 属性中也同时指定，则注解方式将被忽略。-->
+    <!--&ndash;&gt;-->
+    <!--&lt;!&ndash;指定被关联的 JDBC 类型方式2:jdbcType="VARCHAR"&ndash;&gt;-->
+    <!--<typeHandler handler="extend.use.typeHandlers.ExampleTypeHandler" jdbcType="VARCHAR"/>-->
+    <!--</typeHandlers>-->
+    <plugins>
+        <!--<plugin interceptor="extend.use.plugins.customPlugin02_shardtable01.TableShardInterceptor"/>-->
+        <plugin interceptor="extend.use.plugins.customPlugin02_shardtable02.SubTablePlugin"/>
+        <!--<plugin interceptor="extend.use.plugins.customPlugin02.SQLStatsInterceptor2">-->
+        <!--<property name="dialect" value="mysql" />-->
+        <!--</plugin>-->
+    </plugins>
+
+    <!-- 配置环境 -->
+    <environments default="mysql">
+        <!-- 配置mysql的环境-->
+        <environment id="mysql">
+            <!-- 配置事务的类型-->
+            <transactionManager type="JDBC"></transactionManager>
+            <!-- 配置数据源（连接池） -->
+            <dataSource type="POOLED">
+                <!-- 配置连接数据库的4个基本信息 -->
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/mybatis"/>
+                <property name="username" value="root"/>
+                <property name="password" value="root"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 指定映射配置文件的位置，映射配置文件指的是每个dao独立的配置文件 -->
+    <mappers>
+        <mapper resource="extendMapper/mappings/DeviceDao.xml"/>
+        <mapper resource="extendMapper/mappings/SequenceDao.xml"/>
+        <mapper resource="extendMapper/mappings/UserDao.xml"/>
+        <!--<package name="com.lege.dao"/> 这样好像不行-->
+    </mappers>
+    <!--&lt;!&ndash; Using classpath relative resources &ndash;&gt;-->
+    <!--<mappers>-->
+    <!--<mapper resource="org/mybatis/builder/AuthorMapper.xml"/>-->
+    <!--<mapper resource="org/mybatis/builder/BlogMapper.xml"/>-->
+    <!--<mapper resource="org/mybatis/builder/PostMapper.xml"/>-->
+    <!--</mappers>-->
+    <!--&lt;!&ndash; Using url fully qualified paths &ndash;&gt;-->
+    <!--<mappers>-->
+    <!--<mapper url="file:///var/mappers/AuthorMapper.xml"/>-->
+    <!--<mapper url="file:///var/mappers/BlogMapper.xml"/>-->
+    <!--<mapper url="file:///var/mappers/PostMapper.xml"/>-->
+    <!--</mappers>-->
+    <!--&lt;!&ndash; Using mapper interface classes &ndash;&gt;-->
+    <!--<mappers>-->
+    <!--<mapper class="org.mybatis.builder.AuthorMapper"/>-->
+    <!--<mapper class="org.mybatis.builder.BlogMapper"/>-->
+    <!--<mapper class="org.mybatis.builder.PostMapper"/>-->
+    <!--</mappers>-->
+    <!--&lt;!&ndash; Register all interfaces in a package as mappers &ndash;&gt;-->
+    <!--<mappers>-->
+    <!--<package name="org.mybatis.builder"/>-->
+    <!--</mappers>-->
+</configuration>

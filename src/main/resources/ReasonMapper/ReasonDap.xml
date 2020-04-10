@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lege.officialcn.dao.ReasonDao">
+
+    <!--初始化校验是否成功-->
+    <select id="findReasonById" parameterType="map" resultType="com.lege.officialcn.domain.Reason">
+        select *
+        from reason
+        where ID = #{ID}
+    </select>
+
+    <!--动态 SQL:if-->
+    <!--动态 SQL 通常要做的事情是根据条件包含 where 子句的一部分。比如：-->
+    <select id="findReasonWithSubCategoryNameLike" parameterType="map" resultType="com.lege.officialcn.domain.Reason">
+        SELECT * FROM reason
+        WHERE categoryname = "1111"
+        <if test="subcategoryname != null">
+            AND subcategoryname like #{subcategoryname}
+        </if>
+    </select>
+    <!--SELECT * FROM reason WHERE categoryname = "1111" AND subcategoryname like ? AND authorcontent like ? -->
+    <select id="findReasonWithSubCategoryNameLike2" parameterType="map" resultType="com.lege.officialcn.domain.Reason">
+        SELECT * FROM reason
+        WHERE categoryname = "1111"
+        <if test="subcategoryname != null">
+            AND subcategoryname like #{subcategoryname}
+        </if>
+        <if test="authorcontent != null">
+            AND authorcontent like #{authorcontent}
+        </if>
+    </select>
+
+    <!--动态 SQL:choose, when, otherwise-->
+    <select id="findChooseWhenOtherwise" parameterType="map" resultType="com.lege.officialcn.domain.Reason">
+        SELECT * FROM reason WHERE categoryname = "1111"
+        <choose>
+            <when test="subcategoryname != null">
+                AND subcategoryname like #{subcategoryname}
+            </when>
+            <when test="authorcontent != null and authorcontent != `` ">
+                AND authorcontent like #{authorcontent}
+            </when>
+            <otherwise>
+                AND categoryid = 1
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--动态 SQL: trim, where, set-->
+    <!--
+    如果这些条件没有能匹配上会发生什么？下面是第一个没有匹配上出现的情况
+    SELECT * FROM reason WHERE AND subcategoryname like ? AND authorcontent like ?-->
+    <select id="findReasonWithTrimWhereSet1" parameterType="map" resultType="com.lege.officialcn.domain.Reason">
+        SELECT * FROM reason
+        WHERE
+        <if test="categoryname != null">
+            AND categoryname like #{categoryname}
+        </if>
+        <if test="subcategoryname != null">
+            AND subcategoryname like #{subcategoryname}
+        </if>
+        <if test="authorcontent != null">
+            AND authorcontent like #{authorcontent}
+        </if>
+    </select>
+    <!--针对上面的问题做如下处理：使用<where><where/>标签对
+        where 元素只会在至少有一个子元素的条件返回 SQL 子句的情况下才去插入“WHERE”子句。而且，若语句的开头为“AND”或“OR”，where 元素也会将它们去除。
+    -->
+    <select id="findReasonWithTrimWhereSet2" parameterType="map" resultType="com.lege.officialcn.domain.Reason">
+        SELECT * FROM reason
+        <where>
+            <if test="categoryname != null">
+                categoryname like #{categoryname}
+            </if>
+            <if test="subcategoryname != null">
+                AND subcategoryname like #{subcategoryname}
+            </if>
+            <if test="authorcontent != null">
+                AND authorcontent like #{authorcontent}
+            </if>
+        </where>
+    </select>
+
+    <!--TODO set-->
+    <!--<update id="updateAuthorIfNecessary">-->
+        <!--update Author-->
+        <!--<set>-->
+            <!--<if test="username != null">username=#{username},</if>-->
+            <!--<if test="password != null">password=#{password},</if>-->
+            <!--<if test="email != null">email=#{email},</if>-->
+            <!--<if test="bio != null">bio=#{bio}</if>-->
+        <!--</set>-->
+        <!--where id=#{id}-->
+    <!--</update>-->
+
+
+    <!--动态SQL:foreach 详见别处比如：mapper/TopicEntity.xml-->
+
+</mapper>

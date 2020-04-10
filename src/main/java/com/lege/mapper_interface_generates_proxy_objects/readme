@@ -1,0 +1,16 @@
+public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+   //能偷懒的就偷懒，俺把粗活交给MapperProxyFactory去做
+   final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
+   if (mapperProxyFactory == null) {
+     throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
+   }
+   try {
+     //关键在这儿，将sqlSession传入，创建一个MapperProxy
+     return mapperProxyFactory.newInstance(sqlSession);
+   } catch (Exception e) {
+     throw new BindingException("Error getting mapper instance. Cause: " + e, e);
+   }
+}
+————————————————
+每一个DAO接口创建一个代理工厂
+Mybatis中也是为每一个Mapper Class 接口创建一个MapperProxyFactory 即Mapper接口代理工厂

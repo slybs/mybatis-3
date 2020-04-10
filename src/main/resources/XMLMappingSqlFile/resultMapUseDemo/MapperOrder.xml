@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lege.officialcn.dao.resultMapTestDao.MapperOrderDao">
+    <!-- mybatis中批量插入数据 当主键或唯一键重复时 对数据进行更新用ON DUPLICATE KEY UPDATE来实现 -->
+    <!--ON DUPLICATE KEY UPDATE id = #{id} and keyword = #{keyword}-->
+
+    <resultMap type="com.lege.officialcn.domain.resultMapTestDomain.MapperOrder" id="orderUserResultMap">
+        <id property="OrderId" column="OrderID" />
+        <result property="UserId" column="UserID" />
+        <result property="ProductId" column="ProductID" />
+
+        <!-- association ：配置一对一属性 -->
+        <!-- property:order里面的User属性名 -->
+        <!-- javaType:属性类型 -->
+        <!--association:关联,协会:一对一关联起来-->
+        <association property="mapperUser" javaType="com.lege.officialcn.domain.resultMapTestDomain.MapperUser">
+            <!-- id:声明主键，表示user_id是关联查询对象的唯一标识-->
+            <id property="UserId" column="UserID" />
+            <result property="UserName" column="UserName" />
+            <!--<result property="UserAddress" column="UserAddress" />-->
+        </association>
+
+    </resultMap>
+
+
+    <insert id="insert" parameterType="com.lege.officialcn.domain.resultMapTestDomain.MapperOrder">
+        INSERT INTO MapperOrder (OrderID, UserID, ProductID)
+        VALUES (#{OrderId}, #{UserId},#{ProductId})
+    </insert>
+
+    <select id="select" parameterType="map" resultType="com.lege.officialcn.domain.resultMapTestDomain.MapperOrder" flushCache="true">
+        SELECT *
+        FROM MapperOrder
+        WHERE OrderID = #{OrderId}
+    </select>
+
+    <!-- 一对一关联，查询订单，订单内部包含用户属性 -->
+    <select id="select2" parameterType="map" resultMap="orderUserResultMap" flushCache="true">
+        SELECT
+               o.OrderID,
+               o.UserID,
+               o.ProductID,
+               u.UserID,
+               u.UserName
+        FROM `MapperOrder` o
+        LEFT JOIN `MapperUser` u ON o.UserID = u.UserID
+        where o.OrderID= #{OrderId}
+
+    </select>
+    <!--<update id="update" parameterType="com.lege.officialcn.domain.resultMapTestDomain.MapperOrder">-->
+        <!--UPDATE multitest-->
+        <!--SET id = #{id}, keyword = #{keyword}, url = #{url}-->
+        <!--WHERE id = #{id} and keyword=#{keyword}-->
+    <!--</update>-->
+</mapper>

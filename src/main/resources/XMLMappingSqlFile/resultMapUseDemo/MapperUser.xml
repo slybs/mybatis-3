@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lege.officialcn.dao.resultMapTestDao.MapperUserDao">
+
+
+    <resultMap type="com.lege.officialcn.domain.resultMapTestDomain.MapperUser" id="userOrderResultMap1">
+        <id property="UserId" column="UserID" />
+        <result property="UserName" column="UserName" />
+        <result property="UserAddress" column="UserAddress" />
+
+
+        <!-- 配置一对多的关系
+            property：填写pojo类中集合类类属性的名称
+            javaType：填写集合类型的名称
+        -->
+        <!--<collection property="orders" javaType="list" ofType="order">-->
+            <!--&lt;!&ndash; 配置主键，是关联Order的唯一标识 &ndash;&gt;-->
+            <!--<id property="id" column="oid" />-->
+            <!--<result property="number" column="number" />-->
+            <!--<result property="createtime" column="createtime" />-->
+            <!--<result property="note" column="note" />-->
+        <!--</collection>-->
+    </resultMap>
+    <resultMap type="com.lege.officialcn.domain.resultMapTestDomain.MapperUser" id="userOrderResultMap2">
+        <id property="UserId" column="UserID" />
+        <result property="UserName" column="UserName" />
+        <result property="UserAddress" column="UserAddress" />
+
+        <!-- 配置一对多的关系
+            property：填写pojo类中集合类类属性的名称
+            javaType：填写集合类型的名称
+        -->
+        <!--一对多的关联关系：TODO collection (constructor?,id*,result*,association*,collection*, discriminator?)-->
+        <collection property="orders" javaType="java.util.List" ofType="com.lege.officialcn.domain.resultMapTestDomain.MapperOrder">
+            <!-- 配置主键，是关联Order的唯一标识 -->
+            <id property="OrderId" column="OrderID" />
+            <result property="UserId" column="UserID" />
+            <result property="ProductId" column="ProductID" />
+        </collection>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lege.officialcn.domain.resultMapTestDomain.MapperUser">
+        INSERT INTO MapperUser (UserID, UserName, UserAddress)
+        VALUES (#{UserId}, #{UserName},#{UserAddress})
+        ON DUPLICATE KEY UPDATE UserID = #{UserId}
+    </insert>
+
+    <insert id="insert2" parameterType="com.lege.officialcn.domain.resultMapTestDomain.MapperUser">
+        INSERT INTO MapperUser (UserID, UserName, UserAddress)
+        VALUES (#{UserId}, #{UserName},#{UserAddress})
+    </insert>
+
+    <select id="select" parameterType="map" resultType="com.lege.officialcn.domain.resultMapTestDomain.MapperUser" flushCache="true">
+        SELECT *
+        FROM MapperUser
+        WHERE UserID = #{UserId}
+    </select>
+
+    <select id="select2" parameterType="map" resultMap="userOrderResultMap1" flushCache="true">
+        SELECT *
+        FROM MapperUser
+        WHERE UserID = #{UserId}
+    </select>
+
+    <select id="select3" parameterType="map" resultMap="userOrderResultMap2" flushCache="true">
+        SELECT
+               u.UserID,
+               u.UserName,
+               u.UserAddress,
+               o.OrderID,
+               o.UserID,
+               o.ProductID
+        FROM  `MapperUser` u
+        LEFT JOIN `MapperOrder` o ON u.UserID = o.UserID
+        WHERE u.UserID = #{UserId}
+    </select>
+    <!--TODO 依然可以-->
+    <select id="selectWithSQL" parameterType="map" resultType="com.lege.officialcn.domain.resultMapTestDomain.MapperUser" flushCache="true" statementType="STATEMENT">
+        ${sqlStr}
+    </select>
+    <update id="update" parameterType="com.lege.officialcn.domain.resultMapTestDomain.MapperUser">
+        UPDATE MapperUser
+        SET UserID = #{UserId}, UserName = #{UserName}, UserAddress = #{UserAddress}
+        WHERE UserID = #{UserId}
+    </update>
+
+
+
+
+    <!--TODO 1.标准这么玩-->
+    <!--parameterType:将要传入语句的参数的完全限定类名或别名。这个属性是可选的，因为 MyBatis 可以通过类型处理器推断出具体传入语句的参数，默认值为未设置（unset）。-->
+    <!--flushCache	将其设置为 true 后，只要语句被调用，都会导致本地缓存和二级缓存被清空，默认值：true（对于 insert、update 和 delete 语句）。-->
+    <!--timeout	这个设置是在抛出异常之前，驱动程序等待数据库返回请求结果的秒数。默认值为未设置（unset）（依赖驱动）。-->
+    <insert id="insert3">
+        INSERT INTO MapperUser (UserID, UserName, UserAddress)
+        VALUES (#{UserId}, #{UserName},#{UserAddress})
+    </insert>
+    <!--TODO 2.非标准-非编译sql这么玩-->
+    <insert id="insert4" parameterType="java.util.Map" statementType="STATEMENT">
+        <![CDATA[
+        INSERT INTO ${tablename} (UserID, UserName, UserAddress)
+        VALUES (${UserId}, ${UserName},${UserAddress})
+        ]]>
+    </insert>
+    <!--TODO 3.非标准-非编译sql，直接传入SQL语句去执行-->
+    <!--这样竟然是可以的，我的天-->
+    <insert id="insert5" parameterType="com.lege.officialcn.XMLMappingSqlFile.SqlVo" statementType="STATEMENT">
+        ${sqlStr}
+    </insert>
+
+
+
+    <!--下面来操作下MyBatis调用存储过程-->
+    <!-- 根据id查询用户 -->
+    <select id="getUserById" parameterType="Integer" resultType="com.lege.officialcn.domain.resultMapTestDomain.MapperUser" statementType="CALLABLE">
+        {call getUserById(#{ID,mode=IN})}
+    </select>
+
+
+
+
+
+
+
+
+
+
+</mapper>
