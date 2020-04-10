@@ -1,4 +1,4 @@
-package com.lege.officialcn.datasource.DruidDataSource;
+package com.lege.datasource.DruidDataSource;
 
 /**
  * @Author 了个

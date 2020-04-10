@@ -1,4 +1,4 @@
-package com.lege.officialcn.datasource.HikariCPDataSource;
+package com.lege.datasource.HikariCPDataSource;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

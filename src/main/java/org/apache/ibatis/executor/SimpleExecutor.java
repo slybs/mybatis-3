@@ -83,8 +83,14 @@ public class SimpleExecutor extends BaseExecutor {
 
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
+    /**
+     * 从MyBatis初始化时生成的JDBC transcation对象中获取到连接
+     * 具体实现进入看：
+     */
     Connection connection = getConnection(statementLog);
+    System.out.println(connection.getAutoCommit());
     stmt = handler.prepare(connection, transaction.getTimeout());
+    System.out.println(stmt.getConnection().getAutoCommit());
     handler.parameterize(stmt);
     return stmt;
   }

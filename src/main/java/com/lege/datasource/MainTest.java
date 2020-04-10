@@ -1,6 +1,5 @@
-package com.lege.officialcn.datasource;
+package com.lege.datasource;
 
-import com.lege.officialcn.SqlSessionUtil.MultiDataSourceSqlSessionUtil;
 import com.lege.officialcn.dao.IUserDao;
 import com.lege.officialcn.domain.User;
 import org.apache.ibatis.session.SqlSession;
@@ -18,11 +17,10 @@ public class MainTest {
     private static void testSingleDataSource() {
 
 
-        SqlSession sqlSession = SqlSessionUtil.getSession(false);
+        SqlSession sqlSession = SqlSessionUtil.getSession(true);
         IUserDao mapper = sqlSession.getMapper(IUserDao.class);
         List<User> all = mapper.findAll();
         System.out.println(all.size());
-        System.out.println(all);
         sqlSession.commit();
         SqlSessionUtil.closeSession();
 

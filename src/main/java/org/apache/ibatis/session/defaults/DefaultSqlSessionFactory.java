@@ -19,8 +19,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.ibatis.exceptions.ExceptionFactory;
+import org.apache.ibatis.executor.CachingExecutor;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.SimpleExecutor;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
@@ -87,13 +89,49 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
     return configuration;
   }
 
+  /**SqlSession
+   * 这里进行事务的设置，自动提交的设置，会默认覆盖JDBC中设置的autocommit属性
+   * @param execType
+   * @param level
+   * @param autoCommit
+   * @return
+   */
   private SqlSession openSessionFromDataSource(ExecutorType execType, TransactionIsolationLevel level, boolean autoCommit) {
     Transaction tx = null;
     try {
       final Environment environment = configuration.getEnvironment();
+      /**
+       * 1.创建事务对象工厂：这里是JdbcTransactionFactory实例
+       * 2.利用JdbcTransactionFactory创建事务Transaction实例
+       */
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
+      /**
+       * 调用JdbcTransactionFactory#newTransaction 方法
+       *    内部调用new JdbcTransaction(ds, level, autoCommit)
+       *    其中autoCommit是openSession时传过来的值，level也是传过来的值，
+       *    理论上，这两个值可以设置也可以不设置
+       * 这样JdbcTransaction实例中的实例变量将会被赋值：为后续处理埋下伏笔，
+       *      其中1是从数据源处获得的Connection实例的autoCommit属性将会被这里传入的值给覆盖
+       *     dataSource = ds;
+       *     level = desiredLevel;
+       *     autoCommit = desiredAutoCommit;
+       *
+       */
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
+      /**很大一个知识点，mybatis缓存，这里是通过装饰器模式来实现的TODO
+       * executor = new SimpleExecutor(configuration, transaction);
+       * executor = new CachingExecutor(executor);
+       * 这里返回的是CachingExecutor实例
+       */
       final Executor executor = configuration.newExecutor(tx, execType);
+      /**
+       * 最后返回创建一个SqlSession的默认实现DefaultSqlSession实例，
+       * 其中包含一下属性：
+       *     this.configuration = configuration;
+       *     this.executor = executor;
+       *     this.dirty = false;
+       *     this.autoCommit = autoCommit;
+       */
       return new DefaultSqlSession(configuration, executor, autoCommit);
     } catch (Exception e) {
       closeTransaction(tx); // may have fetched a connection so lets call close()

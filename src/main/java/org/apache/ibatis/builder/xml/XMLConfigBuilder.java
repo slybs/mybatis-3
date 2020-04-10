@@ -184,6 +184,9 @@ public class XMLConfigBuilder extends BaseBuilder {
       settingsElement(settings);
 
       // read it after objectFactory and objectWrapperFactory issue #631
+      /**
+       * 1.数据源的初始化在这里
+       */
       // 11.解析 environments 配置
       environmentsElement(root.evalNode("environments"));
 
@@ -421,16 +424,16 @@ public class XMLConfigBuilder extends BaseBuilder {
          * 内容是否一致，一致则返回 true，否则返回 false
          */
         if (isSpecifiedEnvironment(id)) {
-          //解析 配置事务的类型
+          //解析 创建事务工厂实例，这里是JdbcTransactionFactory
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
-          //解析 配置数据源
+          //解析 创建数据源工厂实例，这里是PooledDataSourceFactory
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
-          // 创建 DataSource 对象
+          //从上面创建的数据源工厂中获取创建 DataSource 对象：PooledDataSource
           DataSource dataSource = dsFactory.getDataSource();
+          //构建 Environment 对象，并设置到 configuration 中（会在enviroment对象中包含【事务工厂实例 和 数据源实例】）
           Environment.Builder environmentBuilder = new Environment.Builder(id)
               .transactionFactory(txFactory)
               .dataSource(dataSource);
-          // 构建 Environment 对象，并设置到 configuration 中
           configuration.setEnvironment(environmentBuilder.build());
         }
       }

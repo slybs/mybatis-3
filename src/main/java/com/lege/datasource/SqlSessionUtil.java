@@ -1,4 +1,4 @@
-package com.lege.officialcn.datasource;
+package com.lege.datasource;
 
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -29,7 +29,7 @@ public class SqlSessionUtil {
      * 因此 SqlSessionFactory 的最佳作用域是应用作用域。 有很多方法可以做到，最简单的就是使用单例模式或者静态单例模式。
      */
     private static SqlSessionFactory sessionFactory = null;
-    /*
+    /**
      * 创建本地线程变量，为每一个线程独立管理一个session对象 每一个线程只有且仅有单独且唯一的一个session对象
      * 加上线程变量对session进行管理，可以保证线程安全，避免多实例同时调用同一个session对象
      * 每一个线程都会new一个线程变量，从而分配到自己的session对象

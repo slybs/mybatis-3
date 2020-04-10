@@ -62,6 +62,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
   @Override
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
     PreparedStatement ps = (PreparedStatement) statement;
+    System.out.println(ps.getConnection().getAutoCommit());
     System.out.println(JSON.toJSONString(ps.getQueryTimeout()));
     ps.execute();
     return resultSetHandler.handleResultSets(ps);

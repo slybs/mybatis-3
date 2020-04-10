@@ -262,7 +262,7 @@ public class UnpooledDataSource implements DataSource {
   private Connection doGetConnection(Properties properties) throws SQLException {
     // <1> 初始化 Driver
     initializeDriver();
-    // <2> 获得 Connection 对象
+    // <2> 获得 Connection 对象  JDBC中，一个connection被创建时，默认是auto-commit模式
     Connection connection = DriverManager.getConnection(url, properties);
     // <3> 配置 Connection 对象
     configureConnection(connection);

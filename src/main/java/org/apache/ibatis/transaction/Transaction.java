@@ -21,7 +21,7 @@ import java.sql.SQLException;
 /**
  * Wraps a database connection.
  * Handles the connection lifecycle that comprises: its creation, preparation, commit/rollback and close.
- *
+ * Transaction接口：提供的抽象方法有获取数据库连接getConnection，提交事务commit，回滚事务rollback和关闭连接close，源码如下：
  * @author Clinton Begin
  */
 public interface Transaction {
@@ -31,17 +31,20 @@ public interface Transaction {
    * @return DataBase connection
    * @throws SQLException
    */
+  //获得数据库连接
   Connection getConnection() throws SQLException;
 
   /**
    * Commit inner database connection.
    * @throws SQLException
+   *  提交
    */
   void commit() throws SQLException;
 
   /**
    * Rollback inner database connection.
    * @throws SQLException
+   * 回滚
    */
   void rollback() throws SQLException;
 

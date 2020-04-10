@@ -143,6 +143,10 @@ public class DefaultSqlSession implements SqlSession {
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {
+      /**
+       * MappedStatement维护了一条<select|update|delete|insert>节点的封装
+       * 其id值就是：接口方法的全限定名，所以这里也就说明了Mapper接口不能重载
+       */
       MappedStatement ms = configuration.getMappedStatement(statement);
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {

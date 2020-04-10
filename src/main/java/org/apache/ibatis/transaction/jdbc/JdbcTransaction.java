@@ -98,6 +98,10 @@ public class JdbcTransaction implements Transaction {
     }
   }
 
+  /**
+   * 这里会重设Connection的autoCommit属性，会被在构造SqlSession处传过来的autoCommit值覆盖
+   * @param desiredAutoCommit
+   */
   protected void setDesiredAutoCommit(boolean desiredAutoCommit) {
     try {
       if (connection.getAutoCommit() != desiredAutoCommit) {
@@ -140,10 +144,19 @@ public class JdbcTransaction implements Transaction {
     if (log.isDebugEnabled()) {
       log.debug("Opening JDBC Connection");
     }
+    /**这里从不同数据源获取Connection连接
+     * dataSource 是MyBatis初始化时，更具具体的不同的数据源实现所初始化的DataSource
+     * 这里获取到的Connection的autoCommit是默认的 自动提交 即true
+     */
     connection = dataSource.getConnection();
     if (level != null) {
       connection.setTransactionIsolation(level.getLevel());
     }
+    /**
+     * 这个地方很重，connection的autoCommit会被修改为JdbcTransaction的 autoComit值
+     * 首先JbdcTransaction中的autoCommit属性值 是mybatis初始化时设置进来的 我们设置的为true
+     * 这里会重新设置我们传进来的值用来覆盖JDBC中原生的Conneciton autoCommit的true的属性值
+     */
     setDesiredAutoCommit(autoCommit);
   }
 

@@ -333,7 +333,12 @@ public abstract class BaseExecutor implements Executor {
   }
 
   protected Connection getConnection(Log statementLog) throws SQLException {
+    /**
+     * 从MyBatis初始化时生成的JdbcTransaction实例对象中获取Connection
+     * 里面有些Connection的细节逻辑，进入查看
+     */
     Connection connection = transaction.getConnection();
+    System.out.println(connection.getAutoCommit());
     if (statementLog.isDebugEnabled()) {
       return ConnectionLogger.newInstance(connection, statementLog, queryStack);
     } else {

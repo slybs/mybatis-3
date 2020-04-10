@@ -46,7 +46,7 @@
     <!--TODO 33333333333333333333333333333.类型别名（typeAliases）-->
     <!--类型别名是为 Java 类型设置一个短的名字。 它只和 XML 配置有关，存在的意义仅在于用来减少类完全限定名的冗余。例如：-->
     <typeAliases>
-        <typeAlias  alias="DRUID" type="com.lege.officialcn.datasource.DruidDataSource.DruidDataSourceFactory"/>
+        <typeAlias  alias="DRUID" type="com.lege.datasource.DruidDataSource.DruidDataSourceFactory"/>
         <!--当这样配置时，Blog 可以用在任何使用 domain.blog.Blog 的地方。-->
         <!--<typeAlias alias="Author" type="domain.blog.Author"/>-->
         <!--<typeAlias alias="Blog" type="domain.blog.Blog"/>-->
@@ -73,11 +73,11 @@
 
 
     <!-- 配置环境 -->
-    <environments default="mysql">
+    <environments default="developmentHikariCP">
 
         <environment id="developmentHikariCP">
             <transactionManager type="JDBC"/>
-            <dataSource type="com.lege.officialcn.datasource.HikariCPDataSource.HikariCPDataSourceFactory"/> <!-- 步骤2的类的路径 -->
+            <dataSource type="com.lege.datasource.HikariCPDataSource.HikariCPDataSourceFactory"/> <!-- 步骤2的类的路径 -->
         </environment>
         <environment id="developmentDRUID">
             <transactionManager type="JDBC" />
