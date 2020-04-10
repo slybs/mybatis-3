@@ -1,0 +1,26 @@
+1.读取解析配置文件生成SqlSessionFactory
+
+
+    Node1.DataSource的初始化
+    其中一个点：Configuration parse的时候
+    XMLConfigBuilder#environmentsElement(root.evalNode("environments"));方法中有：
+        TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+        DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
+        DataSource dataSource = dsFactory.getDataSource();
+        Environment.Builder environmentBuilder = new Environment.Builder(id)
+          .transactionFactory(txFactory)
+          .dataSource(dataSource);
+        configuration.setEnvironment(environmentBuilder.build());
+    这里初始化DataSource（根据不同的数据源）
+
+
+
+
+
+
+2. SqlSession session = sessionFactory.openSession(isAutoCommit);
+    openSessionFromDataSource(configuration.getDefaultExecutorType(), null, autoCommit)
+    这里会 创建 Executor接口（用来执行update select insert 等等）
+    final Executor executor = configuration.newExecutor(tx, execType);
+    然后这里创建SqlSession的实现类DefaultSqlSession=====>去返回
+    return new DefaultSqlSession(configuration, executor, autoCommit);
