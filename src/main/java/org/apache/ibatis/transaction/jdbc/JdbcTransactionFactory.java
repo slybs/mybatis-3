@@ -25,10 +25,11 @@ import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
  * Creates {@link JdbcTransaction} instances.
- *
  * @author Clinton Begin
- *
  * @see JdbcTransaction
+ *  事务工厂Transaction定义了创建Transaction的两个方法：
+ *    一个是通过指定的Connection对象创建Transaction，
+ *    另外是通过数据源DataSource来创建Transaction。
  */
 public class JdbcTransactionFactory implements TransactionFactory {
   /**
@@ -42,6 +43,8 @@ public class JdbcTransactionFactory implements TransactionFactory {
   }
 
   /**
+   *  SqlSessionFactory#openSession()和
+   *  SqlSessionFactory#openSession(authoCommit都会调用这里)
    * 根据DataSource、隔离级别和是否自动提交创建Transacion
    * @param ds
    * @param level Desired isolation level

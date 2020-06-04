@@ -27,7 +27,7 @@ import java.util.List;
  *      4.TODO 那么问题是：autocommit = false, sqlSession.rollback(); 时：
  *          不同库表的操作，在后面失败时，前面操作会回滚吗。不会，为什么，因为不同的SqlSession，为什么，因为mybatis的多数据源下，不同数据源需要不同的
  *          SqlSessionFactory，创建的SqlSession，不在同一域下
- * =============>:小结：不同数据源，不同会话（SqlSession），必然不能回滚！,是因为
+ * =============>:小结：不同数据源，不同会话（SqlSession），必然不能回滚！
  */
 public class MainTest {
     /**

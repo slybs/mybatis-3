@@ -26,14 +26,12 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionException;
 
 /**
- * {@link Transaction} that makes use of the JDBC commit and rollback facilities directly.
- * It relies on the connection retrieved from the dataSource to manage the scope of the transaction.
- * Delays connection retrieval until getConnection() is called.
- * Ignores commit or rollback requests when autocommit is on.
- *
- * @author Clinton Begin
- *
  * @see JdbcTransactionFactory
+ *    JdbcTransaction直接使用JDBC的提交和回滚事务管理机制 。
+ *    它依赖与从dataSource中取得的连接connection 来管理transaction 的作用域，
+ *    connection对象的获取被延迟到调用getConnection()方法。
+ *    如果autocommit设置为on，开启状态的话，它会忽略commit和rollback。
+ *    原文链接：https://blog.csdn.net/luanlouis/article/details/37992171
  */
 public class JdbcTransaction implements Transaction {
 
@@ -87,6 +85,10 @@ public class JdbcTransaction implements Transaction {
     }
   }
 
+  /**
+   * 事务的关闭会1提交事务2关闭connection连接
+   * @throws SQLException
+   */
   @Override
   public void close() throws SQLException {
     if (connection != null) {
@@ -153,7 +155,7 @@ public class JdbcTransaction implements Transaction {
       connection.setTransactionIsolation(level.getLevel());
     }
     /**
-     * 这个地方很重，connection的autoCommit会被修改为JdbcTransaction的 autoComit值
+     * 这个地方很重要，connection的autoCommit会被修改为JdbcTransaction的 autoComit值
      * 首先JbdcTransaction中的autoCommit属性值 是mybatis初始化时设置进来的 我们设置的为true
      * 这里会重新设置我们传进来的值用来覆盖JDBC中原生的Conneciton autoCommit的true的属性值
      */

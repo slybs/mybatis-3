@@ -185,6 +185,7 @@ public class XMLConfigBuilder extends BaseBuilder {
 
       // read it after objectFactory and objectWrapperFactory issue #631
       /**
+       * 作为<environment>节点，会根据TransactionFactory和DataSource实例创建一个Environment对象
        * 1.数据源的初始化在这里
        */
       // 11.解析 environments 配置
@@ -425,12 +426,16 @@ public class XMLConfigBuilder extends BaseBuilder {
          */
         if (isSpecifiedEnvironment(id)) {
           //解析 创建事务工厂实例，这里是JdbcTransactionFactory
+          //1.解析<transactionManager>节点，决定创建什么类型的TransactionFactory
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
           //解析 创建数据源工厂实例，这里是PooledDataSourceFactory
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           //从上面创建的数据源工厂中获取创建 DataSource 对象：PooledDataSource
+          //2. 创建dataSource
           DataSource dataSource = dsFactory.getDataSource();
           //构建 Environment 对象，并设置到 configuration 中（会在enviroment对象中包含【事务工厂实例 和 数据源实例】）
+          //3. 使用了Environment内置的构造器Builder，传递id 事务工厂TransactionFactory和数据源DataSource
+          //Configuration 对象中包含事务工厂实例对象，数据源实例对象
           Environment.Builder environmentBuilder = new Environment.Builder(id)
               .transactionFactory(txFactory)
               .dataSource(dataSource);
