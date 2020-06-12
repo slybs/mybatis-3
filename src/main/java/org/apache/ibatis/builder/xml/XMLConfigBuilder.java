@@ -197,7 +197,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       // 13.解析 typeHandlers 配置
       typeHandlerElement(root.evalNode("typeHandlers"));
 
-      // 14.解析 mappers 配置
+      // 14.解析 mappers 配置(Mapper映射初始化)
       mapperElement(root.evalNode("mappers"));
 
     } catch (Exception e) {
